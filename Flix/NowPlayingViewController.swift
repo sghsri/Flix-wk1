@@ -1,3 +1,4 @@
+
 //
 //  NowPlayingViewController.swift
 //  Flix
@@ -8,10 +9,22 @@
 
 import UIKit
 
-class NowPlayingViewController: UIViewController {
+class NowPlayingViewController: UIViewController, UITableViewDataSource {
+
+    
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    var movies: [[String: Any]] = []
+    
+// https://image.tmdb.org/t/p/w500
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.rowHeight = 200
+
+        tableView.dataSource = self
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=aae0e36d928f642b3e2aed52c84ee908")!
         
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -23,6 +36,8 @@ class NowPlayingViewController: UIViewController {
             } else if let data = data{
                 let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                 let movies = dataDictionary["results"] as! [[String: Any]]
+                self.movies = movies
+                self.tableView.reloadData()
                 for movie in movies{
                     let title = movie["title"] as! String
                     print(title)
@@ -34,7 +49,22 @@ class NowPlayingViewController: UIViewController {
         
 
     }
-
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return movies.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
+        
+        let movie = movies[indexPath.row]
+        let title = movie["title"] as! String
+        let overview = movie["overview"] as! String
+        cell.titleLabel.text = title
+        cell.overviewLabel.text = overview
+        
+        
+        return cell
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
