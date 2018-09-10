@@ -67,13 +67,21 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
         
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.cyan
+        cell.selectedBackgroundView = backgroundView
+        
         let movie = movies[indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
-        let posterPathString = movie["poster_path"] as! String
-        let baseURLString = "https://image.tmdb.org/t/p/w500"
-        let posterURL = URL(string: baseURLString+posterPathString)!
-        cell.posterImageView.af_setImage(withURL: posterURL)
+        let placeholderString = "https://via.placeholder.com/275x350"
+        let placeHolderURL = URL(string: placeholderString)!
+        cell.posterImageView.af_setImage(withURL: placeHolderURL)
+        if let posterPathString = movie["poster_path"] as? String{
+            let baseURLString = "https://image.tmdb.org/t/p/w500"
+            let posterURL = URL(string: baseURLString+posterPathString)!
+            cell.posterImageView.af_setImage(withURL: posterURL)
+        }
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
         
