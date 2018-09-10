@@ -14,10 +14,13 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     
     
     @IBOutlet weak var tableView: UITableView!
+    
+    
     var movies: [[String: Any]] = []
     var refreshControl: UIRefreshControl!
 // https://image.tmdb.org/t/p/w500
     
+    @IBOutlet weak var activityMonitor: UIActivityIndicatorView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +39,7 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     }
     
     func fetchMovies(){
+        activityMonitor.startAnimating()
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=aae0e36d928f642b3e2aed52c84ee908")!
         
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -50,6 +54,7 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
                 self.movies = movies
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
+                self.activityMonitor.stopAnimating()
             }
             // This will run when the Network request returns
         }
