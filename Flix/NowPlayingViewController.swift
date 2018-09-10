@@ -15,14 +15,27 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     var movies: [[String: Any]] = []
+    var refreshControl: UIRefreshControl!
 // https://image.tmdb.org/t/p/w500
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.rowHeight = 200
-
+        
+        refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(NowPlayingViewController.didPullToRefresh(_:)), for: .valueChanged)
+        tableView.insertSubview(refreshControl, at: 0)
+        
         tableView.dataSource = self
+        fetchMovies()
+    }
+    
+    func didPullToRefresh(_ refreshControl: UIRefreshControl){
+        fetchMovies()
+    }
+    
+    func fetchMovies(){
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=aae0e36d928f642b3e2aed52c84ee908")!
         
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -36,16 +49,11 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
                 let movies = dataDictionary["results"] as! [[String: Any]]
                 self.movies = movies
                 self.tableView.reloadData()
-                for movie in movies{
-                    let title = movie["title"] as! String
-                    print(title)
-                }
+                self.refreshControl.endRefreshing()
             }
             // This will run when the Network request returns
         }
         task.resume()
-        
-
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -71,6 +79,8 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
     
 
 }
